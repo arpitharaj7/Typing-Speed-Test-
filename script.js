@@ -70,7 +70,7 @@ quoteInputElement.addEventListener("input", () => {
     }
   });
 
-  if (correct) {
+  if (arrayValue.length === arrayQuote.length) {
     endGame();
   }
 });
