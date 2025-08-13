@@ -106,9 +106,33 @@ function endGame() {
 
   quoteInputElement.disabled = true;
 
+wpmElement.innerText = "0";
+  accuracyElement.innerText = "0";
+
+  const stats = { w: 0, a: 0 };
+  if (typeof gsap !== "undefined") {
+    gsap.to(stats, {
+      w: wpm,
+      a: accuracy,
+      duration: 0.8,
+      ease: "power2.out",
+      onUpdate() {
+        wpmElement.innerText = Math.round(stats.w);
+        accuracyElement.innerText = Math.round(stats.a);
+      },
+      onComplete() {
+        wpmElement.innerText = wpm;
+        accuracyElement.innerText = accuracy;
+      }
+    });
+  } else {
+    wpmElement.innerText = wpm;
+    accuracyElement.innerText = accuracy;
+  }
+
   setTimeout(() => {
     alert(`Great job! You typed at ${wpm} WPM with ${accuracy}% accuracy!`);
-  }, 500);
+  }, 1000);
 }
 
 function resetGame() {
@@ -121,6 +145,7 @@ function resetGame() {
   quoteInputElement.value = "";
   startOverlay.style.display = "flex";
   quoteDisplayElement.classList.add("invisible");
+  gsap.set([wpmElement, accuracyElement], { clearProps: "all" });
 }
 
 restartButton.addEventListener("click", renderNewQuote);
