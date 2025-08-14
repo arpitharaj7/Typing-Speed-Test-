@@ -1,4 +1,8 @@
 tailwind.config = {
+            content: ["./index.html", "./script.js"],
+            safelist: [
+                'bg-blue-500/30'
+            ],
             theme: {
                 extend: {
                     fontFamily: {
