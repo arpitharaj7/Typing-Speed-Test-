@@ -1,4 +1,4 @@
-        const quoteDisplayElement = document.getElementById("quote-display");
+const quoteDisplayElement = document.getElementById("quote-display");
         const quoteInputElement = document.getElementById("quote-input");
         const timerElement = document.getElementById("timer");
         const wpmElement = document.getElementById("wpm");
@@ -43,6 +43,39 @@
           resetGame();
         }
 
+        // New function for restart without showing overlay
+        async function restartGame() {
+          const quote = await getRandomQuote();
+          quoteDisplayElement.innerHTML = "";
+          quote.split("").forEach((character) => {
+            const characterSpan = document.createElement("span");
+            characterSpan.innerText = character;
+            quoteDisplayElement.appendChild(characterSpan);
+          });
+          quoteInputElement.value = null;
+          resetGameStats();
+          
+          // Keep the overlay hidden and quote visible
+          startOverlay.style.display = "none";
+          quoteDisplayElement.classList.remove("invisible");
+          quoteInputElement.focus();
+        }
+
+        // Separate function to reset stats without showing overlay
+        function resetGameStats() {
+          clearInterval(timer);
+          startTime = null;
+          timerElement.innerText = 0;
+          wpmElement.innerText = 0;
+          accuracyElement.innerText = 0;
+          quoteInputElement.disabled = false;
+          quoteInputElement.value = "";
+          hideModal();
+          if (typeof gsap !== "undefined") {
+            gsap.set([wpmElement, accuracyElement], { clearProps: "all" });
+          }
+        }
+
         quoteInputElement.addEventListener("input", () => {
           const arrayQuote = quoteDisplayElement.querySelectorAll("span");
           const arrayValue = quoteInputElement.value.split("");
@@ -55,23 +88,39 @@
           let correct = true;
           errors = 0;
 
+          // Store cursor position before DOM manipulation
+          const cursorPosition = quoteInputElement.selectionStart;
+
           arrayQuote.forEach((characterSpan, index) => {
             const character = arrayValue[index];
+            const currentClasses = characterSpan.className;
+            
             if (character == null) {
-              characterSpan.classList.remove(
-                "text-white",
-                "text-red-400"
-              );
+              // Only update if classes need to change
+              if (currentClasses.includes("text-white") || currentClasses.includes("text-red-400")) {
+                characterSpan.classList.remove("text-white", "text-red-400");
+              }
             } else if (character === characterSpan.innerText) {
-              characterSpan.classList.add("text-white");
-              characterSpan.classList.remove("text-red-400");
+              // Only update if not already correct
+              if (!currentClasses.includes("text-white")) {
+                characterSpan.classList.add("text-white");
+                characterSpan.classList.remove("text-red-400");
+              }
             } else {
-              characterSpan.classList.remove("text-white");
-              characterSpan.classList.add("text-red-400");
+              // Only update if not already incorrect
+              if (!currentClasses.includes("text-red-400")) {
+                characterSpan.classList.remove("text-white");
+                characterSpan.classList.add("text-red-400");
+              }
               correct = false;
               errors++;
             }
           });
+
+          // Restore cursor position after DOM manipulation
+          setTimeout(() => {
+            quoteInputElement.setSelectionRange(cursorPosition, cursorPosition);
+          }, 0);
 
           if (arrayValue.length === arrayQuote.length) {
             endGame();
@@ -172,7 +221,7 @@
         modalClose.addEventListener("click", hideModal);
         modalTryAgain.addEventListener("click", () => {
           hideModal();
-          renderNewQuote();
+          restartGame();
         });
 
         // Close modal when clicking outside
@@ -189,6 +238,7 @@
           }
         });
 
-        restartButton.addEventListener("click", renderNewQuote);
+        // Updated restart button to use restartGame instead of renderNewQuote
+        restartButton.addEventListener("click", restartGame);
 
         renderNewQuote();
