@@ -14,6 +14,23 @@ const modalClose = document.getElementById("modal-close");
 
 const QUOTE_API_URL = "https://dummyjson.com/quotes/random";
 
+//Transition for "How fast can you type? -> Show me what you got"
+const subtitle = document.getElementById("subtitle");
+function changeSubtitle(newText) {
+  gsap.to(subtitle, {
+    opacity: 0,
+    duration: 0.5,
+    onComplete: () => {
+      subtitle.textContent = newText;
+      gsap.to(subtitle, { opacity: 1, duration: 0.5 });
+    }
+  });
+}
+setTimeout(() => {
+  changeSubtitle("Show me what you got");
+}, 3000);
+
+
 let timer;
 let startTime;
 let errors = 0;
