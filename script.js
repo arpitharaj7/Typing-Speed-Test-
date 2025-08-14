@@ -1,4 +1,4 @@
-const quoteDisplayElement = document.getElementById("quote-display");
+        const quoteDisplayElement = document.getElementById("quote-display");
         const quoteInputElement = document.getElementById("quote-input");
         const timerElement = document.getElementById("timer");
         const wpmElement = document.getElementById("wpm");
